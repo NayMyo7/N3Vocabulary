@@ -372,10 +372,14 @@ class _QuizTabState extends ConsumerState<QuizTab> {
     final question = _dayQuestions.firstWhere((q) => q.id == questionId);
     final optionsList = [...question.options]..shuffle(_rng);
 
+    // Filter out empty options
+    final filteredOptions =
+        optionsList.where((option) => option.isNotEmpty).toList();
+
     setState(() {
       _finished = false;
       _currentQuestion = question;
-      _options = optionsList;
+      _options = filteredOptions;
       _selected = null;
       _answered = false;
     });
