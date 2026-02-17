@@ -47,60 +47,85 @@ class FuriganaText extends StatelessWidget {
       );
     }
 
-    // Multi-line safe ruby layout.
-    // Each token is rendered as a single unit (ruby stacked above base) inside one Wrap.
-    // This prevents ruby/base desync when the text wraps.
-    final tokenWidgets = <Widget>[];
+    // Split text by line breaks and process each line separately
+    final lines = text.split('\n');
+    final lineWidgets = <Widget>[];
 
-    for (final token in tokens) {
-      final baseText = token.base;
-      final rubyText = token.reading;
+    for (int i = 0; i < lines.length; i++) {
+      final lineText = lines[i];
+      if (lineText.isEmpty) {
+        // Add empty line for blank lines
+        lineWidgets.add(SizedBox(height: baseFontSize * 1.2));
+        continue;
+      }
 
-      final baseWidth = _measureTextWidth(baseText, base);
-      final rubyWidth =
-          rubyText == null ? 0.0 : _measureTextWidth(rubyText, ruby);
-      final w = (baseWidth > rubyWidth ? baseWidth : rubyWidth);
+      final lineTokens =
+          _tokenCache.putIfAbsent(lineText, () => _parse(lineText));
+      final tokenWidgets = <Widget>[];
 
-      tokenWidgets.add(
-        SizedBox(
-          width: w,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (rubyText != null)
+      for (final token in lineTokens) {
+        final baseText = token.base;
+        final rubyText = token.reading;
+
+        final baseWidth = _measureTextWidth(baseText, base);
+        final rubyWidth =
+            rubyText == null ? 0.0 : _measureTextWidth(rubyText, ruby);
+        final w = (baseWidth > rubyWidth ? baseWidth : rubyWidth);
+
+        tokenWidgets.add(
+          SizedBox(
+            width: w,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (rubyText != null)
+                  Text(
+                    rubyText,
+                    style: ruby,
+                    maxLines: 1,
+                    overflow: TextOverflow.visible,
+                    softWrap: false,
+                    textAlign: TextAlign.center,
+                  )
+                else
+                  SizedBox(
+                    height: (ruby.fontSize ?? baseFontSize * 0.5) * 1.2,
+                  ),
                 Text(
-                  rubyText,
-                  style: ruby,
+                  baseText,
+                  style: base.copyWith(height: 1.0),
                   maxLines: 1,
                   overflow: TextOverflow.visible,
                   softWrap: false,
                   textAlign: TextAlign.center,
-                )
-              else
-                SizedBox(
-                  height: (ruby.fontSize ?? baseFontSize * 0.5) * 1.2,
                 ),
-              Text(
-                baseText,
-                style: base.copyWith(height: 1.0),
-                maxLines: 1,
-                overflow: TextOverflow.visible,
-                softWrap: false,
-                textAlign: TextAlign.center,
-              ),
-            ],
+              ],
+            ),
           ),
+        );
+      }
+
+      lineWidgets.add(
+        Wrap(
+          alignment: _wrapAlignment(textAlign),
+          crossAxisAlignment: WrapCrossAlignment.end,
+          spacing: 0,
+          runSpacing: 0,
+          children: tokenWidgets,
         ),
       );
+
+      // Add spacing between lines (except for the last line)
+      if (i < lines.length - 1) {
+        lineWidgets.add(SizedBox(height: baseFontSize * 0.5));
+      }
     }
 
-    return Wrap(
-      alignment: _wrapAlignment(textAlign),
-      crossAxisAlignment: WrapCrossAlignment.end,
-      spacing: 0,
-      runSpacing: 0,
-      children: tokenWidgets,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: lineWidgets,
     );
   }
 }

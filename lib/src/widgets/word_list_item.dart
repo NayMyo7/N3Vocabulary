@@ -44,7 +44,7 @@ class WordListItem extends ConsumerWidget {
           const SizedBox(height: AppSizes.md),
           Text(
             word.burmese,
-            maxLines: 3,
+            maxLines: 5,
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.burmeseText.copyWith(
               color: const Color(0xFF212121),
