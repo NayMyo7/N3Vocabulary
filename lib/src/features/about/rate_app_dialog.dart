@@ -9,7 +9,7 @@ class RateAppDialog extends StatelessWidget {
   static const String _androidUrl =
       'https://play.google.com/store/apps/details?id=com.dragondev.n3vocabulary';
   static const String _iosUrl =
-      'https://apps.apple.com/us/app/n3-vocabulary/id6759038169';
+      'https://apps.apple.com/us/app/n3-vocabulary/id6758401235';
 
   @override
   Widget build(BuildContext context) {

@@ -26,6 +26,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8308156736791023~9458562625</string>
+	<key>AppStoreURL</key>
+	<string>https://apps.apple.com/us/app/n3-vocabulary/id6758401235</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
